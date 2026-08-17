@@ -1,0 +1,20 @@
+# OS Generated Files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Azure & Secret Files
+*.local.json
+local.settings.json
+*.publishsettings
+secrets.json
+
+# Temporary logs
+*.log
