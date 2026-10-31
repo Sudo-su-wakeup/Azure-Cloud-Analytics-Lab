@@ -31,7 +31,6 @@ This repository represents the comprehensive **Proof-of-Work (PoW)** portfolio f
 | **Exp 01** | **ADF Pipeline: On-Prem SQL / Ingestion to Blob Storage** | Azure Data Factory V2, ADLS Gen2, Resource Groups | [📄 EXPERIMENT-01.md](./EXPERIMENT-01.md) | `Completed` ✅ |
 | **Exp 02** | **Linked Service Configuration to ADLS Gen2** | Integration Runtime, Linked Services, Storage Keys | [📄 EXPERIMENT-02.md](./EXPERIMENT-02.md) | `Completed` ✅ |
 | **Exp 03** | **Serverless SQL Analytics & Synapse RBAC Diagnostics** | Azure Synapse Analytics, Serverless SQL (`OPENROWSET`), RBAC | [📄 EXPERIMENT-03.md](./EXPERIMENT-03.md) | `Completed` ✅ |
-| **Exp 04** | **Hybrid Ingestion Pipeline (`PL_Onprem_adls_ingest_Manish_166`)** | Azure Data Factory, Azure Key Vault, ADLS Gen2 (`Ott-adls-011`) | [📄 EXPERIMENT-04.md](./EXPERIMENT-04.md) | `Completed` ✅ |
 
 ---
 
@@ -44,27 +43,17 @@ flowchart TD
     end
 
     subgraph AzureResourceGroup ["Azure Resource Group: RG-CA-core (South India)"]
-        subgraph SecurityLayer ["Key Management Security"]
-            AKV["Azure Key Vault\n(CA-KeyVault)"]
-            LS_KV["Linked Service:\nLS_Keyvault_Manish_166"]
-            AKV --- LS_KV
-        end
-
         subgraph IngestionLayer ["Data Ingestion & Orchestration"]
             ADF["Azure Data Factory\n(adf-jain-cloudanalytics)"]
-            Pipeline["Pipeline:\nPL_Onprem_adls_ingest_Manish_166"]
-            LS_Src["LS_Onprem_File_Manish_166"]
-            LS_Dst["LS_adls_ingest_Manish_166"]
-            ADF --- Pipeline
-            Pipeline --> LS_Src
-            Pipeline --> LS_Dst
+            IR["AutoResolve Integration Runtime\n& Linked Service (LS_Manish_Yadav)"]
+            ADF --- IR
         end
 
         subgraph StorageLayer ["Data Lake Storage Layer (ADLS Gen2)"]
-            Storage["Ott-adls-011\n(ADLS Gen2 Account)"]
+            Storage["caljainstorage1\n(Storage Account)"]
             Container[("Container: raw")]
-            Folder["Folder: ingest/"]
-            Storage --> Container --> Folder
+            Dataset["Manish_Yadav.csv\n(Size: 2.9 KB)"]
+            Storage --> Container --> Dataset
         end
 
         subgraph AnalyticsLayer ["Analytics & Compute Layer"]
@@ -76,15 +65,13 @@ flowchart TD
     end
 
     Entra --> AzureResourceGroup
-    LS_KV -.->|Managed Identity Credentials| LS_Dst
-    LS_Dst --> Folder
-    Query -.->|Read Stream| Folder
+    IR --> Storage
+    Query -.->|Read Stream| Dataset
 
     style AzureResourceGroup fill:#f4f9ff,stroke:#0078D4,stroke-width:2px;
     style StorageLayer fill:#e8f4fc,stroke:#008AD7,stroke-width:1.5px;
     style AnalyticsLayer fill:#ebf3fa,stroke:#005BA1,stroke-width:1.5px;
     style IngestionLayer fill:#edf5fd,stroke:#0078D4,stroke-width:1.5px;
-    style SecurityLayer fill:#fff3cd,stroke:#ffc107,stroke-width:1.5px;
 ```
 
 ---
@@ -98,18 +85,19 @@ flowchart TD
 ├── EXPERIMENT-01.md                           # Experiment 1: Ingestion & ADF Provisioning
 ├── EXPERIMENT-02.md                           # Experiment 2: Linked Service to ADLS Gen2
 ├── EXPERIMENT-03.md                           # Experiment 3: Serverless SQL & RBAC Analysis
-├── EXPERIMENT-04.md                           # Experiment 4: Hybrid Ingestion Pipeline (PL_Onprem_adls_ingest)
-├── deploy_pipeline.ps1                        # Automated PowerShell Deployment Script
-├── adf_artifacts/                             # ADF Arm/JSON Resource Definitions
-│   ├── linkedService/                         # Linked Services (LS_Keyvault, LS_Onprem_File, LS_adls_ingest)
-│   ├── dataset/                               # Datasets (DS_Onprem_File, DS_adls_ingest)
-│   └── pipeline/                              # Pipelines (PL_Onprem_adls_ingest)
 ├── Experiment 1.pdf                           # Original Lab Manual / Exercise Reference
 └── Screenshots/                               # Master Proof-of-Work Screenshot Evidence
     ├── Experiment-01/
+    │   ├── 01_Account_login_successful.png    # Azure Tenant Authentication
+    │   ├── 02_Resource_group.png              # Resource Group RG-CA-core Overview
+    │   ├── 03_ADF_Overview.png                # Azure Data Factory Studio
+    │   └── 04_Raw_data_Blob_Container.png     # Raw Data Ingestion (Manish_Yadav.csv)
     ├── Experiment-02/
-    ├── Experiment-03/
-    └── Experiment-04/                          # Key Vault & Pipeline Configuration Evidence
+    │   └── 01_Test_connection_successful.png  # Linked Service Test Connection Validation
+    └── Experiment-03/
+        ├── 01_Synapse_Analytics_Explorer.png  # Synapse Studio Data Explorer
+        ├── 02_Serverless_SQL_Script_Query.png # Serverless OPENROWSET SQL Script
+        └── 03_Synapse_403_Access_Error.png    # Synapse 403 Forbidden RBAC Diagnostics
 ```
 
 ---
@@ -136,13 +124,6 @@ flowchart TD
   - Auto-generated and configured `OPENROWSET` query targeting `raw/Manish_Yadav.csv`.
   - Root Cause Analysis (RCA) on HTTP Error 403 (Forbidden) and Built-in SQL pool role delegation.
   - Complete enterprise remediation protocol outlining Synapse RBAC and Azure Storage IAM role assignments.
-
-### [Experiment 04: Hybrid Data Ingestion Pipeline (`PL_Onprem_adls_ingest_Manish_166`)](./EXPERIMENT-04.md)
-- **Focus**: Implementing a complete hybrid cloud ingestion pipeline (`PL_Onprem_adls_ingest_Manish_166`) transferring data from On-Premises File Storage to ADLS Gen2 (`Ott-adls-011`) container `raw` folder `ingest`.
-- **Highlights**:
-  - Configured Azure Key Vault (`LS_Keyvault_Manish_166`) via System-Assigned Managed Identity.
-  - Defined Linked Services (`LS_Onprem_File_Manish_166`, `LS_adls_ingest_Manish_166`) and Datasets (`DS_Onprem_File_Manish_166`, `DS_adls_ingest_Manish_166`).
-  - Created automated deployment script `deploy_pipeline.ps1` for Azure PowerShell provisioning.
 
 ---
 
